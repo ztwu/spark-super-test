@@ -28,7 +28,7 @@ object SparkDataFrameTest {
     //导入sqlcontext的隐式函数
     import sqlContext.implicits._
 
-    val user = sqlContext.read.text("D:\\project\\edu_edcc\\ztwu2\\spark-super-test\\data\\user")
+    val user = sqlContext.read.text("data/project/edu_edcc/ztwu2/spark-super-test/data/user")
 
     val userDataFrame = user.map(x=>{
       val line = x.getAs[String](0).split("\t")
@@ -40,7 +40,7 @@ object SparkDataFrameTest {
       (provinceId,cityId,districtId,schoolId,userId)
     }).toDF("province_id","city_id","district_id","school_id","user_id")
 
-    val action = sqlContext.read.text("D:\\project\\edu_edcc\\ztwu2\\spark-super-test\\data\\action")
+    val action = sqlContext.read.text("data/project/edu_edcc/ztwu2/spark-super-test/data/action")
     val actionDataFrame = action.map(x=>{
       val line = x.getAs[String](0).split("\t")
       val userId = line(0)

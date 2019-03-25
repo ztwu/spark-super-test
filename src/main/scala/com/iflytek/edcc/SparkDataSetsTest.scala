@@ -19,12 +19,15 @@ object SparkDataSetsTest {
     conf.setAppName(this.getClass.getName)
     conf.setMaster("local")
 
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    conf.set("spark.kryo.registrator", "com.iflytek.edcc.MyRegistrator")
+
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
     //导入sqlcontext的隐式函数
     import sqlContext.implicits._
 
-    val user = sqlContext.read.text("D:\\project\\edu_edcc\\ztwu2\\spark-super-test\\data\\user")
+    val user = sqlContext.read.text("data/project/edu_edcc/ztwu2/spark-super-test/data/user")
 
     val userRdd = user.map(x=>{
       val line = x.getAs[String](0).split("\t")
@@ -37,21 +40,29 @@ object SparkDataSetsTest {
     })
     val userDataSets = sqlContext.createDataset(userRdd)
 
-    val action = sqlContext.read.text("D:\\project\\edu_edcc\\ztwu2\\spark-super-test\\data\\action")
+    val action = sqlContext.read.text("data/project/edu_edcc/ztwu2/spark-super-test/data/action")
+
+    action.rdd.foreach(x=>println(x))
+
+    println("测试数据--------------------------------------")
     val actionRdd = action.map(x=>{
       val line = x.getAs[String](0).split("\t")
       val userId = line(0).toString
       val actionId = line(1).toString
       val actionNum = line(2).toInt
-      Event(userId,actionId,actionNum)
+//      Event(userId,actionId,actionNum)
+      new Event2(userId,actionId,actionNum)
     })
-    val actionDataSets = sqlContext.createDataset(actionRdd)
 
-    userDataSets.show()
-    actionDataSets.show()
+    actionRdd.foreach(x=>println(x))
 
-    userDataSets
-        .joinWith[Event](actionDataSets,$"userId"===$"actoruserId").show()
+//    val actionDataSets = sqlContext.createDataset(actionRdd)
+
+//    userDataSets.show()
+//    actionDataSets.show()
+
+//    userDataSets
+//        .joinWith[Event](actionDataSets,$"userId"===$"actoruserId").show()
 
 //    userDataFrame
 //      .join(actionDataFrame,userDataFrame("user_id")===actionDataFrame("user_id"))
